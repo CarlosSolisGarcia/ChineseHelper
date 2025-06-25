@@ -1,7 +1,9 @@
+import numpy as np
 import streamlit as st
+from PIL import Image
 from streamlit import session_state
 
-from utils.text_processing import convert_to_simplified, convert_to_traditional
+from utils.text_processing import convert_to_simplified, convert_to_traditional, read_text_from_image
 
 st.title("CSolis的中文助手")
 
@@ -17,8 +19,27 @@ chosen_task = st.segmented_control(label="Tasks:",
                      selection_mode="single")
 
 if chosen_task == available_tasks[0]:
+    ### OCR Branch
     st.write("Great, let me help you with your chosen image.")
-    st.write("COMING SOON")
+    uploaded_image = st.file_uploader(
+        label="Upload an image of a text you would like to process",
+        type=["jpg", "jpeg", "png"],
+    )
+
+    if uploaded_image is not None:
+        # Abrir imagen con PIL
+        image = Image.open(uploaded_image)
+        image = image.convert("RGB")
+        image_np = np.array(image)
+
+        # Mostrar la imagen en la app
+        st.image(image, caption="Uploaded image", use_container_width=True)
+
+        # Mostrar el texto convertido
+        img_text = read_text_from_image(image_np)
+
+        st.write(img_text)
+
 
 elif chosen_task == available_tasks[1]:
     st.write("Please, tell me what you would like to convert.")
